@@ -31,7 +31,7 @@ set_target_properties(Xtb PROPERTIES
 target_link_libraries(Xtb
   PRIVATE
     Scine::UtilsOS
-    lib-xtb-static
+    xtb::xtb
     gfortran
   PUBLIC
     Scine::CoreHeaders
