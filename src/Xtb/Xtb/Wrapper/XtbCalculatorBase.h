@@ -78,10 +78,15 @@ class XtbCalculatorBase
    */
   virtual Scine::Utils::PropertyList getRequiredProperties() const final;
   /**
+   * @brief Getter for the name of the underlying calculator.
+   * @returns Returns the name of the underlying calculator.
+   */
+  virtual std::string name() const = 0;
+  /**
    * @brief Getter for the name of the underlying method.
    * @returns Returns the name of the underlying method.
    */
-  virtual std::string name() const = 0;
+  virtual std::string method() const = 0;
   /**
    * @brief Returns a list of all properties this Calculator can produce.
    * @return Scine::Utils::PropertyList A list of all properties this Calculator
@@ -130,7 +135,7 @@ class XtbCalculatorBase
    * @brief Checks charge and spin multiplicity in settings to be a valid input for the Xtb Wrapper
    * @throws std::runtime_error for wrong input of charge or multiplicity
    */
-  void verifyPesValidity() const;
+  void verifyPesValidity();
 
  protected:
   XtbSettings _settings;
@@ -140,7 +145,7 @@ class XtbCalculatorBase
   std::vector<std::string> _availableSolvationModels = std::vector<std::string>{"gbsa"};
   void _cleanDataStructures(xtb_TEnvironment& env, xtb_TCalculator& calc, xtb_TResults& res, xtb_TMolecule& mol);
   std::map<Utils::ElementType, std::pair<int, int>> _nElectronsAndAos = {
-      {Utils::ElementType::H, {1, 2}},   {Utils::ElementType::He, {2, 4}},  {Utils::ElementType::Li, {1, 4}},
+      {Utils::ElementType::H, {1, 1}},   {Utils::ElementType::He, {2, 4}},  {Utils::ElementType::Li, {1, 4}},
       {Utils::ElementType::Be, {2, 4}},  {Utils::ElementType::B, {3, 4}},   {Utils::ElementType::C, {4, 4}},
       {Utils::ElementType::N, {5, 4}},   {Utils::ElementType::O, {6, 4}},   {Utils::ElementType::F, {7, 4}},
       {Utils::ElementType::Ne, {8, 9}},  {Utils::ElementType::Na, {1, 4}},  {Utils::ElementType::Mg, {2, 9}},

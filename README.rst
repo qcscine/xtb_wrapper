@@ -34,9 +34,11 @@ Installation and Usage
 
 The wrapper can be built and installed using the following commands::
 
+    git submodule init
+    git submodule update
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<desired path> ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DSCINE_BUILD_PYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=<desired path> ..
     make -j<number of cores to use>
     make install
 
@@ -46,15 +48,12 @@ form of the file ``xtb.module.so`` that can be used in SCINE.
 In order to make XTB available to SCINE the following two environment variables
 need to be set::
 
-    export XTBPATH=<prefix-path>/share/xtb
-    export SCINE_MODULE_PATH=$SCINE_MODULE_PATH:<prefix-path>/lib
+    export XTBPATH=<desired path>/share/xtb
+    export SCINE_MODULE_PATH=$SCINE_MODULE_PATH:<desired path>/lib
 
 Afterwards, SCINE programs such as `ReaDuct <https://github.com/qcscine/readuct>`_
 will pick up XTB's existence and it will be possible to request the implemented
 methods.
-
-Python
-......
 
 The SCINE XTB wrapper is also available via Python.
 The underlying SCINE module can be loaded and its implemented calculators
@@ -85,11 +84,11 @@ A minimal workflow could look like this::
 How to Cite
 -----------
 
-When publishing results obtained with SCINE we kindly ask you to cite the
-appropriate references, e.g. the one for ReaDuct.
-This wrapper does not have its own reference; it should also not be mistaken
-for the actual `xtb` code it wraps.
+When publishing results obtained with the SCINE XTB wrapper, please cite the corresponding
+release as archived on `Zenodo <https://zenodo.org/record/5782861>`_ (DOI
+10.5281/zenodo.5782861; please use the DOI of the respective release).
 
+This wrapper should also not be mistaken for the actual `xtb` code it wraps.
 For the latter code and its citations, we refer you to the original `xtb`
 repository. There you will find the references of the actual methods used.
 They are listed in the

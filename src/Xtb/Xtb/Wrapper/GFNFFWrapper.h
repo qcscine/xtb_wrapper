@@ -25,7 +25,7 @@ class GFNFFWrapper : public Scine::Utils::CloneInterface<GFNFFWrapper, XtbCalcul
   static constexpr const char* model = "GFNFF";
   static constexpr const char* program = "Xtb";
   /// @brief Default Constructor
-  GFNFFWrapper() = default;
+  GFNFFWrapper();
   /// @brief Default Destructor.
   ~GFNFFWrapper() = default;
   /// @brief Copy Constructor.
@@ -33,6 +33,13 @@ class GFNFFWrapper : public Scine::Utils::CloneInterface<GFNFFWrapper, XtbCalcul
   /**
    * @brief Getter for the name of the underlying method.
    * @returns Returns the name of the underlying method.
+   */
+  std::string method() const final {
+    return GFNFFWrapper::model;
+  };
+  /**
+   * @brief Getter for the name of the underlying calculator.
+   * @returns Returns the name of the underlying calculator.
    */
   std::string name() const final {
     return "XtbGFNFFCalculator";

@@ -24,6 +24,11 @@ XtbSettings::XtbSettings() : Scine::Utils::Settings("XtbSettings") {
   using namespace Scine::Utils;
   using namespace Scine::Utils::UniversalSettings;
 
+  // Method
+  StringDescriptor method("The method to be used.");
+  method.setDefaultValue("");
+  this->_fields.push_back(SettingsNames::method, method);
+
   // Multiplicity
   IntDescriptor spin_multiplicity("The multiplicity.");
   spin_multiplicity.setMinimum(1);

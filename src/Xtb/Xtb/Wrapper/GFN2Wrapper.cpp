@@ -24,13 +24,17 @@ namespace Xtb {
 
 std::mutex GFN2Wrapper::_mtx;
 
+GFN2Wrapper::GFN2Wrapper() {
+  _settings.modifyString(Utils::SettingsNames::method, this->method());
+}
+
 const Scine::Utils::Results& GFN2Wrapper::calculate(std::string /* dummy */) {
   if (!_settings.valid()) {
     _settings.throwIncorrectSettings();
   }
   verifyPesValidity();
-  const int nCores = _settings.getInt(Utils::SettingsNames::externalProgramNProcs);
 #if defined(_OPENMP)
+  const int nCores = _settings.getInt(Utils::SettingsNames::externalProgramNProcs);
   omp_set_dynamic(0); // Explicitly disable dynamic teams
   omp_set_num_threads(nCores);
 #endif

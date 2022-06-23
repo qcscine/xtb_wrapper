@@ -52,35 +52,14 @@ install(
 
 # Python Bindings
 if(SCINE_BUILD_PYTHON_BINDINGS)
-  # Alternative strategy for finding the python executable and library to
-  # prefer virtualenvs over system paths.
-  if(NOT DEFINED Python_FIND_STRATEGY)
-    set(Python_FIND_STRATEGY LOCATION)
-  endif()
-  if(NOT DEFINED Python_FIND_REGISTRY)
-    set(Python_FIND_REGISTRY LAST)
-  endif()
-  if(NOT DEFINED Python_FIND_VIRTUALENV)
-    set(Python_FIND_VIRTUALENV STANDARD)
-  endif()
-  find_package(Python COMPONENTS Interpreter Development)
+  include(FindPythonInterpreter)
+  find_python_interpreter()
 
   # Copy the module into the python package
   add_custom_command(TARGET Xtb POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Xtb> ${CMAKE_CURRENT_BINARY_DIR}/scine_xtb_wrapper
     COMMENT "Copying 'xtb.module.so' to 'scine_xtb_wrapper'"
   )
-
-  # Python_ set by FindPython and PYTHON_ set by user via -DPYTHON_EXECUTABLE or set by FindPythonInterp, which is deprecated
-  # Prefer PYTHON over Python
-  if(Python_EXECUTABLE AND NOT PYTHON_EXECUTABLE)
-    set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
-  endif()
-
-  if(NOT PYTHON_EXECUTABLE)
-    message(FATAL_ERROR # executable variable is empty, give proper error here instead at install
-            "Unable to find Python interpreter, required for Python Bindings. Please install Python or specify the PYTHON_EXECUTABLE CMake variable.")
-  endif()
 
   install(CODE
   "execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --prefix=${CMAKE_INSTALL_PREFIX} --upgrade --no-deps ${CMAKE_CURRENT_BINARY_DIR}

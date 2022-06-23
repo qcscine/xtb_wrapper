@@ -8,6 +8,8 @@
 /* Internal Includes */
 #include "Xtb/Wrapper/XtbCalculatorBase.h"
 #include "Xtb/Wrapper/XtbState.h"
+#include <algorithm>
+#include <cctype>
 #include <string>
 
 namespace Scine {
@@ -39,7 +41,7 @@ void XtbCalculatorBase::modifyPositions(Scine::Utils::PositionCollection newPosi
 
 const Scine::Utils::PositionCollection& XtbCalculatorBase::getPositions() const {
   if (!this->_structure) {
-    throw std::runtime_error("Failed to modify non existing structure.");
+    throw std::runtime_error("Failed to get non existing structure.");
   }
   return _structure->getPositions();
 }
@@ -82,12 +84,22 @@ std::shared_ptr<Scine::Core::State> XtbCalculatorBase::getState() const {
   return std::make_shared<XtbState>(*_structure);
 }
 
-void XtbCalculatorBase::verifyPesValidity() const {
+void XtbCalculatorBase::verifyPesValidity() {
   if (!_structure) {
     throw std::runtime_error("The " + name() + " calculator does currently not hold a structure");
   }
   const int charge = _settings.getInt(Utils::SettingsNames::molecularCharge);
   const int multiplicity = _settings.getInt(Utils::SettingsNames::spinMultiplicity);
+
+  // Check selected method
+  std::string method = _settings.getString(Utils::SettingsNames::method);
+  std::transform(method.begin(), method.end(), method.begin(), [](unsigned char c) { return std::tolower(c); });
+  std::string model = this->method();
+  std::transform(model.begin(), model.end(), model.begin(), [](unsigned char c) { return std::tolower(c); });
+  if (method != model && method != "any") {
+    throw std::runtime_error("The " + name() + " calculator does not provide the requested method.");
+  }
+  _settings.modifyString(Utils::SettingsNames::method, model);
 
   // get n electrons for uncharged species and available AOs
   int nElectrons = 0;
