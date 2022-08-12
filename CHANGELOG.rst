@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Release 1.0.2
+-------------
+
+- Improve dependency search in installation
+
 Release 1.0.1
 -------------
 
