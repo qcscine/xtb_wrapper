@@ -117,7 +117,7 @@ void XtbCalculatorBase::verifyPesValidity() {
   }
 
   // check charge
-  if (charge >= nElectrons) {
+  if (charge > nElectrons) {
     throw std::runtime_error("XTB: The chosen molecular charge (" + std::to_string(charge) + ") is too positive for " +
                              std::to_string(nElectrons) + " electrons.");
   }

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Release 2.0.0
+-------------
+
+- Change to xtb version 6.5.1
+- Support of zero electron systems
+- Various bugfixes and improvements
+
 Release 1.0.2
 -------------
 

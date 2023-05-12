@@ -195,6 +195,7 @@ const Scine::Utils::Results& GFN2Wrapper::calculate(std::string /* dummy */) {
       _requiredProperties.containsSubSet(Scine::Utils::Property::Thermochemistry)) {
     Scine::Utils::ResultsAutoCompleter completer(*_structure);
     completer.setTemperature(_settings.getDouble(Utils::SettingsNames::temperature));
+    completer.setPressure(_settings.getDouble(Utils::SettingsNames::pressure));
     completer.setMolecularSymmetryNumber(_settings.getInt(Utils::SettingsNames::symmetryNumber));
     completer.addOneWantedProperty(Scine::Utils::Property::Thermochemistry);
     completer.generateProperties(this->_results, *_structure);

@@ -20,7 +20,7 @@ namespace Xtb {
 /**
  * @brief The SCINE Calculator for molecular GFNFF Calculations.
  */
-class GFNFFWrapper : public Scine::Utils::CloneInterface<GFNFFWrapper, XtbCalculatorBase> {
+class GFNFFWrapper : public Scine::Utils::CloneInterface<GFNFFWrapper, XtbCalculatorBase, Scine::Core::Calculator> {
  public:
   static constexpr const char* model = "GFNFF";
   static constexpr const char* program = "Xtb";
@@ -49,8 +49,8 @@ class GFNFFWrapper : public Scine::Utils::CloneInterface<GFNFFWrapper, XtbCalcul
    * @return Scine::Utils::PropertyList
    */
   Scine::Utils::PropertyList possibleProperties() const final {
-    return Scine::Utils::Property::Energy | Scine::Utils::Property::Gradients | Scine::Utils::Property::Hessian |
-           Scine::Utils::Property::Thermochemistry;
+    return Utils::Property::Energy | Utils::Property::Gradients | Utils::Property::Hessian |
+           Utils::Property::SuccessfulCalculation | Utils::Property::Thermochemistry;
   };
   /**
    * @brief Check if the method family is supported by this calculator.

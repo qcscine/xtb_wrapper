@@ -3,7 +3,7 @@ from dev.conan.base import ScineConan
 
 class ScineXtbConan(ScineConan):
     name = "scine_xtb_wrapper"
-    version = "1.0.2"
+    version = "2.0.0"
     url = "https://github.com/qcscine/xtb_wrapper"
     description = """A wrapper around xtb (https://github.com/grimme-lab/xtb),
 it exports GFN0-xTB, GFN1-xTB (formerly GFN-xTB), GFN2-xTB, and GFN-FF into the SCINE tool
@@ -22,9 +22,9 @@ chain."""
     exports_sources = [
         "dev/cmake/*", "src/*", "CMakeLists.txt", "README.rst", "LICENSE.txt",
         "dev/conan/hook.cmake", "dev/conan/glue/*"]
-    build_requires = "xtb/6.4.1"
+    build_requires = "xtb/6.5.1"
     requires = [
-        "scine_utilities/[=6.0.0]",
+        "scine_utilities/8.0.0",
         "boost/[>=1.71.0]",
         "lapack/[>=3.7.1]"
     ]

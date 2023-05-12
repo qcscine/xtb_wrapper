@@ -88,6 +88,12 @@ XtbSettings::XtbSettings() : Scine::Utils::Settings("XtbSettings") {
   thermTemp.setDefaultValue(298.15);
   this->_fields.push_back(SettingsNames::temperature, thermTemp);
 
+  // Pressure used for thermochemical calculations
+  DoubleDescriptor thermPressure("The pressure used for the thermochemical calculation.");
+  thermPressure.setMinimum(1e-6);
+  thermPressure.setDefaultValue(101325);
+  this->_fields.push_back(SettingsNames::pressure, thermPressure);
+
   // Symmetry number used for thermochemical calculations
   IntDescriptor symmetryNumber("The molecular symmetry number used for the thermochemical calculation.");
   symmetryNumber.setMinimum(1);

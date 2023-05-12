@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 
 # Setup the Scine Xtb Project
 project(Xtb
-  VERSION 1.0.2
+  VERSION 2.0.0
   DESCRIPTION "SCINE XTB Wrapper."
 )
 
@@ -34,7 +34,7 @@ if(NOT TARGET lib-xtb-static)
     download_project(
       PROJ xtb
       GIT_REPOSITORY https://github.com/grimme-lab/xtb.git
-      GIT_TAG v6.4.1
+      GIT_TAG v6.5.1
       QUIET
       UPDATE_DISCONNECTED 1
     )
@@ -50,6 +50,10 @@ if(NOT TARGET lib-xtb-static)
       message(FATAL_ERROR ${error_msg})
     endif()
   endif()
+endif()
+
+if(${xtb_WITH_OpenMP})
+  find_dependency("OpenMP" REQUIRED)
 endif()
 
 # Component setup

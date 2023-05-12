@@ -34,11 +34,12 @@ Installation and Usage
 
 The wrapper can be built and installed using the following commands::
 
+    export INSTALL_PATH=<desired path>
     git submodule init
     git submodule update
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DSCINE_BUILD_PYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=<desired path> ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DSCINE_BUILD_PYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=$INSTALL_PATH ..
     make -j<number of cores to use>
     make install
 
@@ -48,8 +49,8 @@ form of the file ``xtb.module.so`` that can be used in SCINE.
 In order to make XTB available to SCINE the following two environment variables
 need to be set::
 
-    export XTBPATH=<desired path>/share/xtb
-    export SCINE_MODULE_PATH=$SCINE_MODULE_PATH:<desired path>/lib
+    export XTBPATH=$INSTALL_PATH/share/xtb
+    export SCINE_MODULE_PATH=$SCINE_MODULE_PATH:$INSTALL_PATH/lib
 
 Afterwards, SCINE programs such as `ReaDuct <https://github.com/qcscine/readuct>`_
 will pick up XTB's existence and it will be possible to request the implemented
@@ -69,8 +70,7 @@ A minimal workflow could look like this::
     structure.positions = [[-0.7, 0, 0], [0.7, 0, 0]]
     
     # Get calculator
-    manager = su.core.ModuleManager()
-    calculator = manager.get('calculator', 'GFN2')
+    calculator = su.core.get_calculator('GFN2', 'xtb')
 
     # Configure calculator
     calculator.structure = structure
