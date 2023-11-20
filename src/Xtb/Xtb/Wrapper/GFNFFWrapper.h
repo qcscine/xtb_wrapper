@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This code is licensed under the 3-clause BSD license.\n
- *            Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.\n
+ *            Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.\n
  *            See LICENSE.txt for details.
  */
 #ifndef XTB_GFNFFWRAPPER_H_
@@ -28,8 +28,6 @@ class GFNFFWrapper : public Scine::Utils::CloneInterface<GFNFFWrapper, XtbCalcul
   GFNFFWrapper();
   /// @brief Default Destructor.
   ~GFNFFWrapper() = default;
-  /// @brief Copy Constructor.
-  GFNFFWrapper(const GFNFFWrapper& other) = default;
   /**
    * @brief Getter for the name of the underlying method.
    * @returns Returns the name of the underlying method.

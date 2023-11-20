@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This code is licensed under the 3-clause BSD license.\n
- *            Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.\n
+ *            Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.\n
  *            See LICENSE.txt for details.
  */
 
@@ -77,6 +77,7 @@ const Scine::Utils::Results& GFN1Wrapper::calculate(std::string /* dummy */) {
   xtb_setMaxIter(env, calc, _settings.getInt(Utils::SettingsNames::maxScfIterations));
   xtb_setElectronicTemp(env, calc, _settings.getDouble(Utils::SettingsNames::electronicTemperature));
   xtb_setVerbosity(env, _settings.getInt("print_level"));
+  setExternalCharges(env, calc, res, mol);
 
   if (Utils::Solvation::ImplicitSolvation::solvationNeededAndPossible(_availableSolvationModels, _settings)) {
     std::string solvent = _settings.getString(Utils::SettingsNames::solvent);
@@ -152,27 +153,52 @@ const Scine::Utils::Results& GFN1Wrapper::calculate(std::string /* dummy */) {
     bos.setMatrix(wbo.sparseView(1e-12, 1.0));
     this->_results.set<Scine::Utils::Property::BondOrderMatrix>(bos);
   }
+  // - Point Charge Gradients
+  if (_requiredProperties.containsSubSet(Scine::Utils::Property::PointChargesGradients)) {
+    std::vector<double> chargesAndPositions = _settings.getDoubleList(Utils::SettingsNames::mmCharges);
+    if (chargesAndPositions.empty()) {
+      this->_results.set<Scine::Utils::Property::SuccessfulCalculation>(false);
+      _cleanDataStructures(env, calc, res, mol);
+      throw std::runtime_error("Cannot give point charges gradients, because no point charges were given.");
+    }
+    const auto nCharges = chargesAndPositions.size() / 5;
+    Utils::GradientCollection grad = Utils::GradientCollection::Zero(nCharges, 3);
+    xtb_getPCGradient(env, res, grad.data());
+    if (xtb_checkEnvironment(env) != 0) {
+      xtb_showEnvironment(env, nullptr);
+      this->_results.set<Scine::Utils::Property::SuccessfulCalculation>(false);
+      _cleanDataStructures(env, calc, res, mol);
+      throw Core::UnsuccessfulCalculationException("Could not read XTB point charges gradients.");
+    }
+    this->_results.set<Scine::Utils::Property::PointChargesGradients>(grad);
+  }
   // - Partial charges
-  std::vector<double> q(natoms, 0.0);
-  xtb_getCharges(env, res, q.data());
-  if (xtb_checkEnvironment(env) != 0) {
-    xtb_showEnvironment(env, nullptr);
-    this->_results.set<Scine::Utils::Property::SuccessfulCalculation>(false);
-    _cleanDataStructures(env, calc, res, mol);
-    throw Core::UnsuccessfulCalculationException("Could not read XTB partial charges.");
+  if (_requiredProperties.containsSubSet(Scine::Utils::Property::AtomicCharges)) {
+    std::vector<double> q(natoms, 0.0);
+    xtb_getCharges(env, res, q.data());
+    if (xtb_checkEnvironment(env) != 0) {
+      xtb_showEnvironment(env, nullptr);
+      this->_results.set<Scine::Utils::Property::SuccessfulCalculation>(false);
+      _cleanDataStructures(env, calc, res, mol);
+      throw Core::UnsuccessfulCalculationException("Could not read XTB partial charges.");
+    }
+    this->_results.set<Scine::Utils::Property::AtomicCharges>(q);
   }
-  this->_results.set<Scine::Utils::Property::AtomicCharges>(q);
   // - Occupation
-  auto occupation = Scine::Utils::LcaoUtils::ElectronicOccupation();
-  if (uhf == 0) {
-    occupation.fillLowestRestrictedOrbitalsWithElectrons(attyp.sum() - static_cast<int>(charge));
+  if (_requiredProperties.containsSubSet(Scine::Utils::Property::ElectronicOccupation) or
+      _requiredProperties.containsSubSet(Scine::Utils::Property::Hessian) or
+      _requiredProperties.containsSubSet(Scine::Utils::Property::Thermochemistry)) {
+    auto occupation = Scine::Utils::LcaoUtils::ElectronicOccupation();
+    if (uhf == 0) {
+      occupation.fillLowestRestrictedOrbitalsWithElectrons(attyp.sum() - static_cast<int>(charge));
+    }
+    else {
+      int alpha = (attyp.sum() - static_cast<int>(charge) + uhf) / 2;
+      int beta = (attyp.sum() - static_cast<int>(charge) - uhf) / 2;
+      occupation.fillLowestUnrestrictedOrbitals(alpha, beta);
+    }
+    this->_results.set<Scine::Utils::Property::ElectronicOccupation>(occupation);
   }
-  else {
-    int alpha = (attyp.sum() - static_cast<int>(charge) + uhf) / 2;
-    int beta = (attyp.sum() - static_cast<int>(charge) - uhf) / 2;
-    occupation.fillLowestUnrestrictedOrbitals(alpha, beta);
-  }
-  this->_results.set<Scine::Utils::Property::ElectronicOccupation>(occupation);
   //  - Dipole
   // Eigen::VectorXd dipole = Eigen::VectorXd::Zero(3);
   // xtb_getDipole(env, res, dipole.data());

@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This code is licensed under the 3-clause BSD license.\n
- *            Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.\n
+ *            Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.\n
  *            See LICENSE.txt for details.
  */
 #ifndef XTB_GFN2WRAPPER_H_
@@ -28,8 +28,6 @@ class GFN2Wrapper : public Scine::Utils::CloneInterface<GFN2Wrapper, XtbCalculat
   GFN2Wrapper();
   /// @brief Default Destructor.
   ~GFN2Wrapper() = default;
-  /// @brief Copy Constructor.
-  GFN2Wrapper(const GFN2Wrapper& other) = default;
   /**
    * @brief Getter for the name of the underlying method.
    * @returns Returns the name of the underlying method.
@@ -49,8 +47,9 @@ class GFN2Wrapper : public Scine::Utils::CloneInterface<GFN2Wrapper, XtbCalculat
    * @return Scine::Utils::PropertyList
    */
   Scine::Utils::PropertyList possibleProperties() const final {
-    return Utils::Property::Energy | Utils::Property::AtomicCharges | Utils::Property::Gradients | Utils::Property::Hessian |
-           Utils::Property::BondOrderMatrix | Utils::Property::SuccessfulCalculation | Utils::Property::Thermochemistry;
+    return Utils::Property::Energy | Utils::Property::AtomicCharges | Utils::Property::Gradients |
+           Utils::Property::Hessian | Utils::Property::BondOrderMatrix | Utils::Property::SuccessfulCalculation |
+           Utils::Property::Thermochemistry | Utils::Property::PointChargesGradients;
   };
   /**
    * @brief Check if the method family is supported by this calculator.

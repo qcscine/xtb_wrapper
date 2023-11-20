@@ -1,5 +1,5 @@
 __copyright__ = """This code is licensed under the 3-clause BSD license.
-Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.
+Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.
 See LICENSE.txt for details.
 """
 
@@ -7,7 +7,7 @@ import os
 import scine_utilities as utils
 from distutils import ccompiler
 
-manager = utils.core.ModuleManager()
+manager = utils.core.ModuleManager.get_instance()
 if not manager.module_loaded('Xtb'):
     shlib_suffix = ccompiler.new_compiler().shared_lib_extension
     module_filename = "xtb.module" + shlib_suffix

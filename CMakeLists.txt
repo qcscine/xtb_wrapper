@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 
 # Setup the Scine Xtb Project
 project(Xtb
-  VERSION 2.0.0
+  VERSION 3.0.0
   DESCRIPTION "SCINE XTB Wrapper."
 )
 

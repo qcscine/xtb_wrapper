@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Release 3.0.0
+-------------
+
+- Enable external point charges for QM/MM
+- Update address in license
+
 Release 2.0.0
 -------------
 

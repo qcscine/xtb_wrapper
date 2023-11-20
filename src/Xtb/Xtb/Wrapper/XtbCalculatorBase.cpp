@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This code is licensed under the 3-clause BSD license.\n
- *            Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.\n
+ *            Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.\n
  *            See LICENSE.txt for details.
  */
 
@@ -15,11 +15,13 @@
 namespace Scine {
 namespace Xtb {
 
-XtbCalculatorBase::XtbCalculatorBase(const XtbCalculatorBase& other) {
+XtbCalculatorBase::XtbCalculatorBase(const XtbCalculatorBase& other) : CloneInterface(other) {
   _settings = other._settings;
   _results = other._results;
   _requiredProperties = other._requiredProperties;
-  _structure = std::make_unique<Scine::Utils::AtomCollection>(*(other._structure));
+  if (other._structure) {
+    _structure = std::make_unique<Scine::Utils::AtomCollection>(*(other._structure));
+  }
 }
 
 void XtbCalculatorBase::setStructure(const Scine::Utils::AtomCollection& structure) {
@@ -144,8 +146,43 @@ void XtbCalculatorBase::verifyPesValidity() {
   }
 }
 
+void XtbCalculatorBase::setExternalCharges(xtb_TEnvironment& env, xtb_TCalculator& calc, xtb_TResults& res, xtb_TMolecule& mol) {
+  std::vector<double> chargesAndPositions = _settings.getDoubleList(Utils::SettingsNames::mmCharges);
+  if (chargesAndPositions.empty()) {
+    return;
+  }
+  const auto nCharges = chargesAndPositions.size();
+  if (nCharges % 5 != 0) {
+    _cleanDataStructures(env, calc, res, mol);
+    throw std::runtime_error("The number of external charges and positions is not a multiple of 5.");
+  }
+  std::vector<double> charges;
+  std::vector<int> atomicNumbers;
+  Utils::PositionCollection positions(static_cast<long>(nCharges) / 5, 3);
+  int j = 0;
+  for (unsigned long i = 0; i < nCharges; i += 5) {
+    charges.push_back(chargesAndPositions[i]);
+    const auto atomicNumber = chargesAndPositions[i + 1];
+    if (atomicNumber < 1 || atomicNumber > 118) {
+      _cleanDataStructures(env, calc, res, mol);
+      throw std::runtime_error("The atomic number of an external charge is not in the range [1, 118].");
+    }
+    atomicNumbers.push_back(static_cast<int>(atomicNumber));
+    positions.row(j).x() = chargesAndPositions[i + 2];
+    positions.row(j).y() = chargesAndPositions[i + 3];
+    positions.row(j).z() = chargesAndPositions[i + 4];
+    j++;
+  }
+  auto nEntries = static_cast<int>(nCharges / 5);
+  xtb_setExternalCharges(env, calc, &nEntries, atomicNumbers.data(), charges.data(), positions.data());
+  _setExternalCharges = true;
+}
+
 void XtbCalculatorBase::_cleanDataStructures(xtb_TEnvironment& env, xtb_TCalculator& calc, xtb_TResults& res,
                                              xtb_TMolecule& mol) {
+  if (_setExternalCharges) {
+    xtb_releaseExternalCharges(env, calc);
+  }
   xtb_delResults(&res);
   xtb_delCalculator(&calc);
   xtb_delMolecule(&mol);

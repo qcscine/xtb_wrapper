@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This code is licensed under the 3-clause BSD license.\n
- *            Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.\n
+ *            Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.\n
  *            See LICENSE.txt for details.
  */
 
@@ -99,6 +99,11 @@ XtbSettings::XtbSettings() : Scine::Utils::Settings("XtbSettings") {
   symmetryNumber.setMinimum(1);
   symmetryNumber.setDefaultValue(1);
   this->_fields.push_back(SettingsNames::symmetryNumber, symmetryNumber);
+
+  // External charges for QM/MM
+  DoubleListDescriptor externalCharges("The external charges for QM/MM calculations given as continuous list with"
+                                       "charge, atomic_number, x, y, z coordinate.");
+  this->_fields.push_back(SettingsNames::mmCharges, externalCharges);
 
   // Parallel execution
   IntDescriptor parallel("The maximum number of cores to be used.");

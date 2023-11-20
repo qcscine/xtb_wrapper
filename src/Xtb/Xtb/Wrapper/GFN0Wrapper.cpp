@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This code is licensed under the 3-clause BSD license.\n
- *            Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.\n
+ *            Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.\n
  *            See LICENSE.txt for details.
  */
 
@@ -131,16 +131,20 @@ const Scine::Utils::Results& GFN0Wrapper::calculate(std::string /* dummy */) {
     this->_results.set<Scine::Utils::Property::Gradients>(grad);
   }
   // - Occupation
-  auto occupation = Scine::Utils::LcaoUtils::ElectronicOccupation();
-  if (uhf == 0) {
-    occupation.fillLowestRestrictedOrbitalsWithElectrons(attyp.sum() - static_cast<int>(charge));
+  if (_requiredProperties.containsSubSet(Scine::Utils::Property::ElectronicOccupation) or
+      _requiredProperties.containsSubSet(Scine::Utils::Property::Hessian) or
+      _requiredProperties.containsSubSet(Scine::Utils::Property::Thermochemistry)) {
+    auto occupation = Scine::Utils::LcaoUtils::ElectronicOccupation();
+    if (uhf == 0) {
+      occupation.fillLowestRestrictedOrbitalsWithElectrons(attyp.sum() - static_cast<int>(charge));
+    }
+    else {
+      int alpha = (attyp.sum() - static_cast<int>(charge) + uhf) / 2;
+      int beta = (attyp.sum() - static_cast<int>(charge) - uhf) / 2;
+      occupation.fillLowestUnrestrictedOrbitals(alpha, beta);
+    }
+    this->_results.set<Scine::Utils::Property::ElectronicOccupation>(occupation);
   }
-  else {
-    int alpha = (attyp.sum() - static_cast<int>(charge) + uhf) / 2;
-    int beta = (attyp.sum() - static_cast<int>(charge) - uhf) / 2;
-    occupation.fillLowestUnrestrictedOrbitals(alpha, beta);
-  }
-  this->_results.set<Scine::Utils::Property::ElectronicOccupation>(occupation);
   // Calculate Hessian
   if (_requiredProperties.containsSubSet(Scine::Utils::Property::Hessian) or
       _requiredProperties.containsSubSet(Scine::Utils::Property::Thermochemistry)) {

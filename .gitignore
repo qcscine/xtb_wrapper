@@ -1,5 +1,24 @@
-build
-.vscode
+# build files
+build/*
+build-*
+cmake-build-*
+compile_commands.json
+install/*
+.conan_test_package/build
+
+# hidden files
+.cache
 *.swp
-install
-inst
+.idea/*
+.lvimrc
+.vscode
+
+# python files
+*__pycache__*
+
+# generated source files
+externalQC_output_location.h
+orca_output_location.h
+
+# conan ci files
+conan/*

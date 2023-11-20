@@ -1,7 +1,7 @@
 /**
  * @file
  * @copyright This code is licensed under the 3-clause BSD license.\n
- *            Copyright ETH Zurich, Laboratory of Physical Chemistry, Reiher Group.\n
+ *            Copyright ETH Zurich, Department of Chemistry and Applied Biosciences, Reiher Group.\n
  *            See LICENSE.txt for details.
  */
 #ifndef XTB_XTBCALCULATORBASE_H_
@@ -136,6 +136,13 @@ class XtbCalculatorBase
    * @throws std::runtime_error for wrong input of charge or multiplicity
    */
   void verifyPesValidity();
+  /**
+   * @brief Whether the calculator has no underlying Python code and can therefore
+   * release the global interpreter lock in Python bindings
+   */
+  bool allowsPythonGILRelease() const override {
+    return true;
+  };
 
  protected:
   XtbSettings _settings;
@@ -143,7 +150,9 @@ class XtbCalculatorBase
   Scine::Utils::PropertyList _requiredProperties;
   std::unique_ptr<Scine::Utils::AtomCollection> _structure;
   std::vector<std::string> _availableSolvationModels = std::vector<std::string>{"gbsa"};
+  bool _setExternalCharges = false;
   void _cleanDataStructures(xtb_TEnvironment& env, xtb_TCalculator& calc, xtb_TResults& res, xtb_TMolecule& mol);
+  void setExternalCharges(xtb_TEnvironment& env, xtb_TCalculator& calc, xtb_TResults& res, xtb_TMolecule& mol);
   std::map<Utils::ElementType, std::pair<int, int>> _nElectronsAndAos = {
       {Utils::ElementType::H, {1, 1}},   {Utils::ElementType::He, {2, 4}},  {Utils::ElementType::Li, {1, 4}},
       {Utils::ElementType::Be, {2, 4}},  {Utils::ElementType::B, {3, 4}},   {Utils::ElementType::C, {4, 4}},
