@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Release 3.0.1
+-------------
+
+- Fix segfault if an empty structure was supplied
+
 Release 3.0.0
 -------------
 

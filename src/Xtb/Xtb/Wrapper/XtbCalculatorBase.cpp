@@ -30,7 +30,10 @@ void XtbCalculatorBase::setStructure(const Scine::Utils::AtomCollection& structu
 }
 
 std::unique_ptr<Scine::Utils::AtomCollection> XtbCalculatorBase::getStructure() const {
-  return std::make_unique<Scine::Utils::AtomCollection>(*_structure);
+  if (!_structure) {
+    return std::make_unique<Utils::AtomCollection>(Utils::AtomCollection());
+  }
+  return std::make_unique<Utils::AtomCollection>(*_structure);
 }
 
 void XtbCalculatorBase::modifyPositions(Scine::Utils::PositionCollection newPositions) {
