@@ -4,7 +4,6 @@ build-*
 cmake-build-*
 compile_commands.json
 install/*
-.conan_test_package/build
 
 # hidden files
 .cache
@@ -19,6 +18,3 @@ install/*
 # generated source files
 externalQC_output_location.h
 orca_output_location.h
-
-# conan ci files
-conan/*

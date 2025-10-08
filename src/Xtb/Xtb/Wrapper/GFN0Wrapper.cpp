@@ -39,14 +39,14 @@ const Scine::Utils::Results& GFN0Wrapper::calculate(std::string /* dummy */) {
 #endif
   // Prepare Data
   const int natoms = _structure->size();
-  auto elements = _structure->getElements();
-  Eigen::VectorXi attyp(natoms);
+  Utils::ElementTypeCollection elements = _structure->getElements();
+  Eigen::VectorXi attyp = Eigen::VectorXi::Zero(natoms);
   for (int i = 0; i < natoms; i++) {
     attyp[i] = Scine::Utils::ElementInfo::Z(elements[i]);
   }
   const double charge = _settings.getInt(Utils::SettingsNames::molecularCharge); // double because xtb wants double
   const int uhf = _settings.getInt(Utils::SettingsNames::spinMultiplicity) - 1;
-  auto coord = _structure->getPositions();
+  Utils::PositionCollection coord = _structure->getPositions();
 
   // Prepare XTB classes
   xtb_TEnvironment env = xtb_newEnvironment();
@@ -120,8 +120,12 @@ const Scine::Utils::Results& GFN0Wrapper::calculate(std::string /* dummy */) {
   this->_results.set<Scine::Utils::Property::Energy>(energy);
   // - Gradients
   if (_requiredProperties.containsSubSet(Scine::Utils::Property::Gradients)) {
-    Utils::GradientCollection grad = Utils::GradientCollection::Zero(natoms, 3);
-    xtb_getGradient(env, res, grad.data());
+    // xtb requires column major
+    Eigen::Matrix<double, 3, Eigen::Dynamic> gradXtb(3, natoms);
+    xtb_getGradient(env, res, gradXtb.data());
+
+    // Transpose it into required format
+    Utils::GradientCollection grad = gradXtb.transpose();
     if (xtb_checkEnvironment(env) != 0) {
       xtb_showEnvironment(env, nullptr);
       this->_results.set<Scine::Utils::Property::SuccessfulCalculation>(false);

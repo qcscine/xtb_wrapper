@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Release 3.0.2
+-------------
+
+- Add unit test for energy and gradient calculation
+
 Release 3.0.1
 -------------
 

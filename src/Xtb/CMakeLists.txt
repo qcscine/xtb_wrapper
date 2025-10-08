@@ -1,7 +1,9 @@
 # Load lists of source files
 include(Files.cmake)
+file(GLOB_RECURSE XTB_TEST_CPPS ${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.cpp)
 
-# Find/Import dependecies
+
+# Find/Import dependencies
 include(ImportUtilsOS)
 import_utils_os()
 include(ImportCore)
@@ -118,6 +120,44 @@ if(SCINE_BUILD_PYTHON_BINDINGS)
   )
   file(COPY ${PROJECT_SOURCE_DIR}/LICENSE.txt ${EXTERNAL_LICENSE_FILES}
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/scine_xtb_wrapper
+  )
+endif()
+
+if (SCINE_BUILD_TESTS)
+  include(ImportGTest)
+  import_gtest()
+
+  add_executable(XtbWrapper_tests
+          ${XTB_TEST_CPPS}
+  )
+
+  target_link_libraries(XtbWrapper_tests
+          PRIVATE
+          GTest::Main
+          GMock::GMock
+          Xtb
+          Scine::UtilsOS
+          Scine::Core
+          ${CMAKE_DL_LIBS}
+  )
+
+  target_include_directories(XtbWrapper_tests
+          SYSTEM PRIVATE
+          ${Boost_INCLUDE_DIR}
+  )
+
+  file(
+          COPY ${CMAKE_CURRENT_SOURCE_DIR}/Tests/Resources
+          DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+  )
+
+  include(GoogleTest)
+  gtest_discover_tests(
+          XtbWrapper_tests
+          EXTRA_ARGS
+          --gtest_output=xml:gtest_report.xml
+          CONFIGURATIONS
+          Debug;Release
   )
 endif()
 
